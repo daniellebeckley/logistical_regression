@@ -49,12 +49,12 @@ int main(int argc, char *argv[]){
 /*
   Reads the float values in ModelFile and stores them in a vector
 */
-vector<float> Read_File(char * model_file){
+vector<float> Read_File(char * f){
 
   vector<float> weight;
 
   // Convert File Name to String
-  std::string file(model_file);
+  std::string file(f);
 
   // Read File
   ifstream in(file.c_str());
