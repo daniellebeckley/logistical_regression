@@ -22,7 +22,7 @@ int main(int argc, char* argv[]){
 	read_in_file(trueLabelFile, truth);
 
 	double accuracy = compare(predicted, truth);
-	cout << "Accuracy:" << accuracy*100 << "%" << endl;
+	cout << "Accuracy: " << accuracy << endl;
 
 return 0;
 }
