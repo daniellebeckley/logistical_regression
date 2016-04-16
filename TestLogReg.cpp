@@ -71,8 +71,6 @@ vector<float> Read_Model_File(char * model_file){
 
   }
 
-  }
-
   return weight;
 }
 
@@ -97,20 +95,20 @@ void Read_Test_Feature_File(char * test_file, vector<float> w, char* predLabelFi
 
   if (in.is_open()){
 
-    // The file is a single line
     for (int i = 0; i < D; i++){
       string line, word;
       getline(in, line);
-      cout << line << endl;
+
       // Reads String char by char
       for (int i = 0; i < line.length() + 1; i++){
         char x = line[i];
-
+        
         // Retreives each substring in the string
         if(x != ' '){
           word = word + x;
           x = line[i];
         }
+        
         if ( x == ' ' || i == line.length()) {
           // Converts string to (float)double and adds it to weight vector
           char *c = &word[0u];
@@ -130,6 +128,8 @@ void Read_Test_Feature_File(char * test_file, vector<float> w, char* predLabelFi
       if (DotProduct(w,testVector) < 0){
         outputFile << "0" << endl;
       }
+      
+      // Clears out testVector to be used again
       testVector.clear();
 
     }
