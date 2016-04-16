@@ -7,8 +7,9 @@
 
 using namespace std;
 
-vector<float> Read_File(char * model_File);
+vector<float> Read_Model_File(char * model_File);
 float DotProduct(vector<float> w, vector<float> x);
+void Read_Test_Feature_File(char * test_file, vector<float> w, char* predLabelFile, int D);
 
 int main(int argc, char *argv[]){
 
@@ -17,31 +18,15 @@ int main(int argc, char *argv[]){
   char* predLabelFile = argv[3];
   char* charD = argv[4];
 
-  //Convert D to an int
+  //Converts D to an int
   std::string stringD(charD);
   int D = atoi(stringD.c_str());
 
-  // Creates and opens output file
-  ofstream outputFile;
-  outputFile.open(predLabelFile);
-
   // ModelFile Vector
-  vector<float> w = Read_File(modelFile);  // use model file created in part 1
+  vector<float> w = Read_Model_File(modelFile);
 
-  /*
-    Computes the DotProduct of ModelFile vector, w, and all 'D' testFeatureFile
-    vectors, x, and writes them to the newly created file
-  */
-  for (int i = 0; i < D; i++){
-    vector<float> x = Read_File(testFeatureFile);
-
-    if (DotProduct(w,x) > 0){
-      outputFile << "1" << endl;
-    }
-    if (DotProduct(w,x) < 0){
-      outputFile << "0" << endl;
-    }
-  }
+  // Reads TestFeatureFile, Computes Dot Product of vectors and writes results to predLabelFile
+  Read_Test_Feature_File(testFeatureFile, w, predLabelFile, D);
 
   return 0;
 }
@@ -49,12 +34,12 @@ int main(int argc, char *argv[]){
 /*
   Reads the float values in ModelFile and stores them in a vector
 */
-vector<float> Read_File(char * f){
+vector<float> Read_Model_File(char * model_file){
 
   vector<float> weight;
 
   // Convert File Name to String
-  std::string file(f);
+  std::string file(model_file);
 
   // Read File
   ifstream in(file.c_str());
@@ -66,7 +51,7 @@ vector<float> Read_File(char * f){
     getline(in, line);
     string word;
 
-    // Reads String char by char
+    // Reads string char by char
     for (int i = 0; i < line.length() + 1; i++){
       char x = line[i];
 
@@ -86,13 +71,79 @@ vector<float> Read_File(char * f){
 
   }
 
+  }
+
   return weight;
+}
+
+/*
+  Reads input TestFeatureFile line by line
+  Then computes dot product of each line vector and the modelFile, w, vector
+  Writes result to the predLabelFile
+*/
+void Read_Test_Feature_File(char * test_file, vector<float> w, char* predLabelFile, int D){
+
+  // Creates and opens output file
+  ofstream outputFile;
+  outputFile.open(predLabelFile);
+
+  vector<float> testVector;
+
+  // Convert File Name to String
+  std::string file(test_file);
+
+  // Read Input File
+  ifstream in(file.c_str());
+
+  if (in.is_open()){
+
+    // The file is a single line
+    for (int i = 0; i < D; i++){
+      string line, word;
+      getline(in, line);
+      cout << line << endl;
+      // Reads String char by char
+      for (int i = 0; i < line.length() + 1; i++){
+        char x = line[i];
+
+        // Retreives each substring in the string
+        if(x != ' '){
+          word = word + x;
+          x = line[i];
+        }
+        if ( x == ' ' || i == line.length()) {
+          // Converts string to (float)double and adds it to weight vector
+          char *c = &word[0u];
+          double num = atof(c);
+          testVector.push_back((float)num);
+          word = "";
+        }
+      }
+
+      /*
+        Computes the DotProduct of ModelFile vector, w, and all 'D' testFeatureFile
+        vectors, x, and writes them to the newly created file
+      */
+      if (DotProduct(w,testVector) > 0){
+        outputFile << "1" << endl;
+      }
+      if (DotProduct(w,testVector) < 0){
+        outputFile << "0" << endl;
+      }
+      testVector.clear();
+
+    }
+  }
 }
 
 /*
   Returns the dot product of 2 vectors
 */
 float DotProduct(vector<float> w, vector<float> x){
-  return inner_product(w.begin(), w.end(), x.begin(), 0.0);
-}
 
+  float product = 0;
+  for (int i = 0; i <= w.size()-1; i++){
+    product += (w[i] * x[i]);
+  }
+  return product;
+}
