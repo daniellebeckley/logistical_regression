@@ -7,7 +7,7 @@
 
 using namespace std;
 
-vector<float> Read_Model_File(char * model_File, int N_iterations);
+vector<float> Read_Model_File(char * model_File);
 float DotProduct(vector<float> w, vector<float> x);
 void Read_Test_Feature_File(char * test_file, vector<float> w, char* predLabelFile, int D);
 
@@ -22,8 +22,8 @@ int main(int argc, char *argv[]){
   std::string stringD(charD);
   int D = atoi(stringD.c_str());
 
-  // ModelFile Vector, of size D
-  vector<float> w = Read_Model_File(modelFile, D);
+  // ModelFile Vector
+  vector<float> w = Read_Model_File(modelFile);
 
   // Reads TestFeatureFile, Computes Dot Product of vectors and writes results to predLabelFile
   Read_Test_Feature_File(testFeatureFile, w, predLabelFile, D);
@@ -34,7 +34,7 @@ int main(int argc, char *argv[]){
 /*
   Reads the float values in ModelFile and stores them in a vector
 */
-vector<float> Read_Model_File(char * model_file, int N_iterations){
+vector<float> Read_Model_File(char * model_file){
 
   vector<float> weight;
 
@@ -46,29 +46,29 @@ vector<float> Read_Model_File(char * model_file, int N_iterations){
   string line;
 
   if (in.is_open()){
-  	for (int j = 0; j < N_iterations; j++) {
-  	  // Get current line
-  	  getline(in, line);
-  	  string word;
 
-  	  // Reads string char by char
-  	  for (int i = 0; i < line.length() + 1; i++){
-  	    char x = line[i];
-	
-  	    // Retreives each substring in the string
-  	    if(x != ' '){
-  	      word = word + x;
-  	      x = line[i];
-  	    }
-  	    if ( x == ' ' || i == line.length()) {
-  	      // Converts string to (float)double and adds it to weight vector
-  	      char *c = &word[0u];
-  	      double num = atof(c);
-  	      weight.push_back((float)num);
-  	      word = "";
-  	    }
-  	  }
-  	}
+    // The file is a single line
+    getline(in, line);
+    string word;
+
+    // Reads string char by char
+    for (int i = 0; i < line.length() + 1; i++){
+      char x = line[i];
+
+      // Retreives each substring in the string
+      if(x != ' '){
+        word = word + x;
+        x = line[i];
+      }
+      if ( x == ' ' || i == line.length()) {
+        // Converts string to (float)double and adds it to weight vector
+        char *c = &word[0u];
+        double num = atof(c);
+        weight.push_back((float)num);
+        word = "";
+      }
+    }
+
   }
 
   return weight;
