@@ -3,37 +3,38 @@
 #include <fstream>
 #include <vector>
 #include <cmath>
+#include <numeric>		// include inner_product
 
 using namespace std;
 
 void read_training_label(string filename, vector<int> &training_label, int N_samples);
-void read_training_feature(string filename, vector<int> &training_feature, int N_samples);
+void read_training_feature(string filename,  vector< vector<int> > &training_feature, int D_features, int N_samples);
+void initialize_w(vector<float> &w, int D_features);
 
 int main(int argc, char* argv[]){
 	//getting parameters
     string feature_name = argv[1];
     string label_name = argv[2];
     string model_file_param = argv[3];
-	int D_features = atoi(argv[4]);      //we don't need to worry about this because of how we
-										 // split up lines in the training_feature_function
+	int D_features = atoi(argv[4]);      
 	int N_iterations = atoi(argv[5]); 
 
 //short cut for command line:  ./a.out trainingFeature.dat trainingLabel.dat ModelFile.txt 1 1000
   
     //variables
     vector<int> training_label;
-    vector<int> training_feature;
-    float c = 1*pow(10, -6);
-    int t = 0;
+    vector< vector<int> > training_feature;
+    float c = 1*pow(10, -6), denomenator, dot_w_xi, exponential;
+    int t = 0, yi, currLabel;
     vector<float> w;
 
     //reading in files to vectors
     read_training_label(label_name, training_label, N_iterations);
-    read_training_feature(feature_name, training_feature, N_iterations);
+    read_training_feature(feature_name, training_feature, D_features, N_iterations);
+	initialize_w(w, D_features);
 
-    //applying logistical regression to test features
-
-	int yi, xi, currLabel, cross_w_xi = 0, numerator, denomenator, loss;
+    //applying logistical regression to test features	
+	w.push_back(0);								// Start with w vector only containing 0
     for(int i = 0; i < N_iterations; i++){
 		t++;
 
@@ -45,46 +46,65 @@ int main(int argc, char* argv[]){
 			yi = -1;
 		}
 		else{
-			yi = 0;
+			yi = 1;
 		}
 
-		// Read current ine from training featuer and assign value to xi
-		// 		0 --> -1
-		// 		1 --> 0
-		xi = training_feature.at(i);
+		// Read next D features from 'training_feature' vector and assign values to xi
+		vector<int> xi(training_feature[i]);
+		//cout << "xi size: " << xi.size() << endl;
 
+
+		/* compute ∇w L = -yi xi exp(-yi w·xi) / (1+ exp(-yi w·xi)) */
 		// Compute the cross product of w and xi
-		for (int j=0; j < w.size(); j++){
-			cross_w_xi += (w.at(j) * xi);
+		dot_w_xi = inner_product(&xi.at(0), &xi.at(D_features-1), &w.at(0), 0);
+		//cout << dot_w_xi << endl;
+
+		// Compute (-yi * xi)
+		yi = yi * -1;
+		vector<int> yi_xi;
+		for (int j=0; j < D_features; j++){
+			yi_xi.push_back(xi.at(j) * yi);
 		}
+
+		// compute exp(-yi w·xi)
+		exponential = exp(yi * dot_w_xi);
 
 		// compute numerator (-yi xi exp(-yi w·xi))
-		numerator = ((-1 * yi) * xi * exp((-1 * yi) * cross_w_xi));
+		vector<float> numerator;
+		for (int j=0; j < D_features; j++){
+			numerator.push_back((float) yi_xi.at(j) * exponential);
+		}
 
 		// compute denomenator (1+ exp(-yi w·xi))
-		denomenator = (1 + exp((-1 * yi) * cross_w_xi));
-	
-		// compute ∇w L = -yi xi exp(-yi w·xi) / (1+ exp(-yi w·xi)) 
-		loss = numerator / denomenator;
+		denomenator = (1 + exponential);
+
+		//loss = numerator / denomenator;
+		vector<float> loss;
+		for (int j=0; j < D_features; j++){
+			loss.push_back(numerator.at(j) / denomenator);
+		}
 
     	//compute w←w–(c/t)∇w L
-		float curr = (0.000001/ t) * loss;
-		w.push_back(curr);
-
+		vector<float> temp;
+		float c_t = c/t;
+		for (int j=0; j < D_features; j++){
+			temp.push_back(w.at(j) - (c_t * loss.at(j)));
+		}
+		w.swap(temp);
     }
 
     //writing to the file: 
     ofstream modelFile(model_file_param);
     while(w.size() > 0){
-      modelFile << w.back() << endl;
+      modelFile << w.back() << " ";
       w.pop_back();
     }
 
     modelFile.close();
 
     cout << "done" << endl;
-    cout << training_label.size() << endl;
-    cout << training_feature.size() << endl;
+    cout << "Training_label size: " << training_label.size() << endl;
+    cout << "Training_feature size: " << training_feature.size() << endl;
     return 0;
 }
 
@@ -93,10 +113,10 @@ void read_training_label(string filename, vector<int>& training_label, int N_sam
     string line; 	
     int track = 0;
 
-    // If training label file is open, read N_sample amount of lines and 
-    //   add int (0 or 1) to training label vector
+    /* If training label file is open, read 'N_samples' amount of lines and 
+       add int (0 or 1) to training label vector */
     if(in.is_open()){
-        while(getline(in,line) && track < N_samples){
+        while(getline(in,line) && track < N_samples){		
             training_label.push_back(stoi(line));
             track++;	 
         }
@@ -105,15 +125,15 @@ void read_training_label(string filename, vector<int>& training_label, int N_sam
     else{ cout << "unable to open training label file!" << endl;}
 }
 
-void read_training_feature(string filename, vector<int> &training_feature, int N_samples){
+void read_training_feature(string filename, vector< vector<int> > &training_feature, int D_features, int N_samples){
     ifstream in(filename.c_str());
     string line;
-    int track = 0;
+    int samples = 0;
     
     // If training feature file is open, read N_sample amount of lines and
     //    copy each int to traing freature vector 
     if(in.is_open()){
-        while(getline(in, line) && track < N_samples){
+        /*while(getline(in, line) && track < N_samples){
             int start = 0;
             for(int i = 0; i < line.length() && track < N_samples; i++){
                 if(line.at(i) == ' '){
@@ -123,7 +143,35 @@ void read_training_feature(string filename, vector<int> &training_feature, int N
                     start = i;
                 }
             }
-        }
+        }*/
+
+		/* If training feature file is open:
+				- Read in each line, until you've read in 'N_samples' samples
+				- Parse line, and add each feature to 'training_feature' vector until
+					'D_features' amount of features are added 
+		*/
+		while (getline(in, line) && samples < N_samples){
+			int start = 0;
+			int features = 0;
+			vector<int> curr_sample(1,D_features);
+			training_feature.push_back(curr_sample);
+			for (int i=0; i < line.length() && features < D_features; i++){	
+				if (line.at(i) == ' '){
+					string current = line.substr(start, i);
+					training_feature[samples].push_back(stoi(current));
+					start = i;
+					features++;
+				}	
+			}
+			samples++;
+		}
     }
     else{ cout << "unable to open training feature file!" << endl;}
 }
+
+void initialize_w(vector<float> &w, int D_features){
+	for (int i=0; i<D_features; i++){
+		w.push_back(0);
+	}
+}
+ 
