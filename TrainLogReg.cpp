@@ -26,13 +26,13 @@ int main(int argc, char* argv[]){
     vector< vector<int> > training_feature;
     float c = 1*pow(10, -6), denomenator, dot_w_xi, exponential;
     int t = 0, yi, currLabel;
-    vector<float> w;
+    vector<float> w, temp;
 
     //reading in files to vectors
     read_training_label(label_name, training_label, N_iterations);
     read_training_feature(feature_name, training_feature, D_features, N_iterations);
 	initialize_w(w, D_features);
-
+	
     //applying logistical regression to test features	
     for(int i = 0; i < N_iterations; i++){
 		t++;
@@ -50,20 +50,17 @@ int main(int argc, char* argv[]){
 
 		// Read next D features from 'training_feature' vector and assign values to xi
 		vector<int> xi(training_feature[i]);
-		//cout << "xi size: " << xi.size() << endl;
-
 
 		/* compute ∇w L = -yi xi exp(-yi w·xi) / (1+ exp(-yi w·xi)) */
 		// Compute the dot product of w and xi
-		dot_w_xi = inner_product(&xi.at(0), &xi.at(D_features-1), &w.at(0), 0);
-		//cout << dot_w_xi << endl;
-
-		// Compute (-yi * xi)
-		yi = yi * -1;
-		vector<int> yi_xi;
-		for (int j=0; j < D_features; j++){
-			yi_xi.push_back(xi.at(j) * yi);
+		//dot_w_xi = inner_product(&xi.at(0), &xi.at(D_features-1), &w.at(0), 0);
+		dot_w_xi = 0;
+		for (int j=0; j<D_features; j++){
+			dot_w_xi += w[j] * xi[j];
 		}
+
+		// yi = -yi
+		yi = yi * -1;
 
 		// compute exp(-yi w·xi)
 		exponential = exp(yi * dot_w_xi);
@@ -71,7 +68,7 @@ int main(int argc, char* argv[]){
 		// compute numerator (-yi xi exp(-yi w·xi))
 		vector<float> numerator;
 		for (int j=0; j < D_features; j++){
-			numerator.push_back((float) yi_xi.at(j) * exponential);
+			numerator.push_back((float) yi * (float) xi[j] * exponential);
 		}
 
 		// compute denomenator (1+ exp(-yi w·xi))
@@ -80,16 +77,16 @@ int main(int argc, char* argv[]){
 		//loss = numerator / denomenator;
 		vector<float> loss;
 		for (int j=0; j < D_features; j++){
-			loss.push_back(numerator.at(j) / denomenator);
+			loss.push_back(numerator[j] / denomenator);
 		}
 
     	//compute w←w–(c/t)∇w L
-		vector<float> temp;
 		float c_t = c/t;
 		for (int j=0; j < D_features; j++){
-			temp.push_back(w.at(j) - (c_t * loss.at(j)));
+			temp.push_back(w[j] - (c_t * loss[j]));
 		}
 		w.swap(temp);
+		temp.clear();
     }
 
     //writing to the file: 
@@ -149,15 +146,14 @@ void read_training_feature(string filename, vector< vector<int> > &training_feat
 				- Parse line, and add each feature to 'training_feature' vector until
 					'D_features' amount of features are added 
 		*/
+		training_feature.resize(N_samples, vector<int>(D_features, 0));
 		while (getline(in, line) && samples < N_samples){
 			int start = 0;
 			int features = 0;
-			vector<int> curr_sample(1,D_features);
-			training_feature.push_back(curr_sample);
 			for (int i=0; i < line.length() && features < D_features; i++){	
 				if (line.at(i) == ' '){
 					string current = line.substr(start, i);
-					training_feature[samples].push_back(stoi(current));
+					training_feature[samples][features] = (stoi(current));
 					start = i;
 					features++;
 				}	
@@ -168,6 +164,9 @@ void read_training_feature(string filename, vector< vector<int> > &training_feat
     else{ cout << "unable to open training feature file!" << endl;}
 }
 
+/*
+	Intialized weight vector to zero
+*/
 void initialize_w(vector<float> &w, int D_features){
 	for (int i=0; i<D_features; i++){
 		w.push_back(0);
