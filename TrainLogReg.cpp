@@ -34,7 +34,6 @@ int main(int argc, char* argv[]){
 	initialize_w(w, D_features);
 
     //applying logistical regression to test features	
-	w.push_back(0);								// Start with w vector only containing 0
     for(int i = 0; i < N_iterations; i++){
 		t++;
 
@@ -55,7 +54,7 @@ int main(int argc, char* argv[]){
 
 
 		/* compute ∇w L = -yi xi exp(-yi w·xi) / (1+ exp(-yi w·xi)) */
-		// Compute the cross product of w and xi
+		// Compute the dot product of w and xi
 		dot_w_xi = inner_product(&xi.at(0), &xi.at(D_features-1), &w.at(0), 0);
 		//cout << dot_w_xi << endl;
 
