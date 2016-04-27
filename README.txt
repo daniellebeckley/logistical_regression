@@ -1,4 +1,3 @@
-# logistical_regression
 Artificial Intel Project 3
 Danielle Beckley, Cameron Lloyd, Caleb Underwood
 
@@ -20,4 +19,3 @@ TrainLogReg trainingFeature.dat trainingLabel.dat modelFile 785 1
 TestLogReg modelFile testFeature.dat predLabelFile 785
 Accuracy predLabelFile trainingLabel.dat
   
-
