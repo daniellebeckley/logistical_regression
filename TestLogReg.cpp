@@ -12,9 +12,6 @@ vector<float> Read_Model_File(string model_File, int D_features);
 float DotProduct(vector<float> w, vector<float> x);
 void Read_Test_Feature_File(string test_file, vector<float> w, string predLabelFile, int D_features);
 
-// TODO 
-void print_vector(string filename, vector<float> &v);
-
 int main(int argc, char *argv[]){
 
 	string modelFile = argv[1];
