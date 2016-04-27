@@ -21,8 +21,9 @@ Accuracy.cpp
   
 To Run:
 -----------
-TrainLogReg trainingFeature.dat trainingLabel.dat modelFile 785 12665<br>
-TestLogReg modelFile testFeature.dat predLabelFile 785<br>
-Accuracy predLabelFile trainingLabel.dat
-  
+```
+> ./TrainLogReg trainingFeature.dat trainingLabel.dat modelFile 785 12665<
+> ./TestLogReg modelFile testFeature.dat predLabelFile 785
+> ./Accuracy predLabelFile trainingLabel.dat
+```  
 
