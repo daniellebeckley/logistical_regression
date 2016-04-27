@@ -17,5 +17,5 @@ To Run:
 -----------
 TrainLogReg trainingFeature.dat trainingLabel.dat modelFile 785 1
 TestLogReg modelFile testFeature.dat predLabelFile 785
-Accuracy predLabelFile testFeature.dat trainingLabel.dat
+Accuracy predLabelFile trainingLabel.dat
   
