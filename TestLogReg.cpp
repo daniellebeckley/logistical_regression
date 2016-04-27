@@ -38,30 +38,6 @@ vector<float> Read_Model_File(string model_file, int D_features){
 
 	if (in.is_open()){
 
-/*
-		// The file is a single line
-		getline(in, line);
-		string word;
-
-		// Reads string char by char
-		for (int i = 0; i < line.length() + 1; i++){
-			char x = line[i];
-
-			// Retreives each substring in the string
-			if(x != ' '){
-				word = word + x;
-				x = line[i];
-			}
-			if ( x == ' ' || i == line.length()) {
-				// Converts string to (float)double and adds it to weight vector
-				char *c = &word[0u];
-				double num = atof(c);
-				weight.push_back((float)num);
-				word = "";
-			}
-		}
-*/
-
 		getline(in, line);
 		istringstream iss(line);
 		string word;
@@ -90,48 +66,7 @@ void Read_Test_Feature_File(string test_file, vector<float> w, string predLabelF
 
 
 	if (in.is_open()){
-
-/*
-		for (int i = 0; i < D; i++){
-			string word;
-			getline(in, line);
-			int start = 0;
-			// Reads String char by char
-			for (int i = 0; i < line.length() + 1; i++){
-				char x = line[i];
-        
-				// Retreives each substring in the string
-				if(x != ' '){
-					word = word + x;
-					x = line[i];
-				}
-        	
-				if ( x == ' ' || i == line.length()) {
-					// Converts string to (float)double and adds it to weight vector
-					char *c = &word[0u];
-					double num = atof(c);
-					testVector.push_back((float)num);
-					word = "";
-				}
-			}	
-
-			/*	
-				Computes the DotProduct of ModelFile vector, w, and all 'D' testFeatureFile
-				vectors, x, and writes them to the newly created file
-			
-			if (DotProduct(w,testVector) >= 0){
-				outputFile << "1" << endl;
-			}
-			if (DotProduct(w,testVector) < 0){
-				outputFile << "0" << endl;
-			}
-      
-			// Clears out testVector to be used again
-			testVector.clear();
-		}
-*/
-		
-
+	
 		while (getline(in, line)){
 			istringstream iss(line);
 			for (int i=0; i < D_features; i++){

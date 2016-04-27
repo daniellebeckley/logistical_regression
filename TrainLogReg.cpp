@@ -12,7 +12,6 @@ void read_training_label(string filename, vector<int> &training_label, int N_sam
 void read_training_feature(string filename,  vector< vector<int> > &training_feature, int D_features, int N_samples);
 void initialize_w(vector<float> &w, int D_features);
 
-// TODO
 void print_vector(string filename, vector<float> &v);
 void print_2Dvector(string filename, vector< vector<int> > &v, int D_features, int N_samples);
 
@@ -24,10 +23,7 @@ int main(int argc, char* argv[]){
 	int D_features = atoi(argv[4]);      
 	int N_iterations = atoi(argv[5]); 
 
-// TODO
-//	string testVFile = argv[6];
-
-//short cut for command line:  ./a.out trainingFeature.dat trainingLabel.dat ModelFile.txt 1 1000
+//short cut for command line:  ./a.out trainingFeature.dat trainingLabel.dat ModelFile.txt 785 12665
   
     //variables
     vector<int> training_label;
@@ -55,29 +51,22 @@ int main(int argc, char* argv[]){
 		else{
 			yi = 1;
 		}
-// TODO 
-//		cout << "yi: " << yi << endl;
 
 		// Read next D features from 'training_feature' vector and assign values to xi
 		vector<int> xi(training_feature[i]);
 
 		/* compute ∇w L = -yi xi exp(-yi w·xi) / (1+ exp(-yi w·xi)) */
 		// Compute the dot product of w and xi
-		//dot_w_xi = inner_product(&xi.at(0), &xi.at(D_features-1), &w.at(0), 0);
 		dot_w_xi = 0;
 		for (int j=0; j<D_features; j++){
 			dot_w_xi += w[j] * xi[j];
 		}
-// TODO
-//		cout << "dot: " << dot_w_xi << endl;
 
 		// yi = -yi
 		yi *= -1;
 
 		// compute exp(-yi w·xi)
-		exponential = exp(yi * dot_w_xi);
-// TODO
-//		cout << "exp: " << exponential << endl;
+		exponential = exp((float)yi * dot_w_xi);
 
 		// compute numerator (-yi xi exp(-yi w·xi))
 		vector<float> numerator;
@@ -92,13 +81,8 @@ int main(int argc, char* argv[]){
 			numerator.push_back(curr);
 		}
 
-// TODO
-//		print_vector(testVFile, numerator);
-
 		// compute denomenator (1+ exp(-yi w·xi))
 		denomenator = (1 + exponential);
-// TODO
-//		cout << "denom: " << denomenator << endl;
 
 		//loss = numerator / denomenator;
 		vector<float> loss;
@@ -106,27 +90,20 @@ int main(int argc, char* argv[]){
 			loss.push_back(numerator[j] / denomenator);
 		}
 
-// TODO
-//		print_vector(testVFile, loss);
-
     	//compute w←w–(c/t)∇w L
 		float c_t = c/t;
 		for (int j=0; j < D_features; j++){
 			temp.push_back(w[j] - (c_t * loss[j]));
 		}
-// TODO
-		//print_vector(testVFile, temp);
 
+		// Swap contents of 'temp' with vector 'w'
 		w.swap(temp);
 
+		// Clear contents of vectors
 		temp.clear();
 		xi.clear();
 		numerator.clear();
 		loss.clear();
-
-// TODO
-//		cout << "End of iter: " << i << endl;
-//		cout << endl;
     }
 
     //writing to the file: 
@@ -139,6 +116,9 @@ int main(int argc, char* argv[]){
     return 0;
 }
 
+/*
+	Read values from trainingLabel.dat and store in vector of type int
+*/
 void read_training_label(string filename, vector<int>& training_label, int N_samples){
     ifstream in(filename.c_str());
     string line; 	
@@ -156,11 +136,14 @@ void read_training_label(string filename, vector<int>& training_label, int N_sam
     else{ cout << "unable to open training label file!" << endl;}
 }
 
+/*
+	Read values from trainingFeature.dat and store in a (N_samples X D_features) 2D vector
+		of type int
+*/
 void read_training_feature(string filename, vector< vector<int> > &training_feature, int D_features, int N_samples){
     ifstream in(filename.c_str());
     string line;
     int samples = 0;
-    
 
 	/* If training feature file is open:
 			- Read in each line, until you've read in 'N_samples' samples
@@ -168,17 +151,6 @@ void read_training_feature(string filename, vector< vector<int> > &training_feat
 				'D_features' amount of features are added 
 	*/
     if(in.is_open()){
-        /*while(getline(in, line) && track < N_samples){
-            int start = 0;
-            for(int i = 0; i < line.length() && track < N_samples; i++){
-                if(line.at(i) == ' '){
-                    string current = line.substr(start, i);
-                    training_feature.push_back(stoi(current));
-                    track++;
-                    start = i;
-                }
-            }
-        }*/
 
 		training_feature.resize(N_samples, vector<int>(D_features, 0));
 		while (getline(in, line) && samples < N_samples){
@@ -203,8 +175,9 @@ void initialize_w(vector<float> &w, int D_features){
 	}
 }
 
-
-// TODO
+/*
+	Print vector 'v' of type float to file called 'filename'
+*/
 void print_vector(string filename, vector<float> &v){
     ofstream modelFile(filename);
 	for (int i=0; i<v.size(); i++){
@@ -213,6 +186,9 @@ void print_vector(string filename, vector<float> &v){
     modelFile.close();
 }
 
+/*
+	Print 2D vector of type int to file called 'filename'
+*/
 void print_2Dvector(string filename, vector< vector<int> > &v, int D_features, int N_samples){
     ofstream modelFile(filename);
 	for (int i=0; i<N_samples; i++){
