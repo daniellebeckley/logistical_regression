@@ -131,6 +131,7 @@ void Read_Test_Feature_File(string test_file, vector<float> w, string predLabelF
 		}
 */
 		
+
 		while (getline(in, line)){
 			istringstream iss(line);
 			for (int i=0; i < D_features; i++){
@@ -141,7 +142,7 @@ void Read_Test_Feature_File(string test_file, vector<float> w, string predLabelF
 			/*	
 				Computes the DotProduct of ModelFile vector, w, and all 'D' testFeatureFile
 				vectors, x, and writes them to the newly created file
-			*/			
+			*/		
 			if (DotProduct(w,testVector) > 0){
 				outputFile << "1" << endl;
 			}
@@ -157,6 +158,7 @@ void Read_Test_Feature_File(string test_file, vector<float> w, string predLabelF
 		outputFile.close();
 	}
     else{ cout << "unable to open test feature file!" << endl;}
+
 }
 
 /*
