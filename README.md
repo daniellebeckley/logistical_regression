@@ -6,7 +6,7 @@ To Compile:
 -----------
 
 - From ./logistical_regression, run the command `make`
-  - Note: If you are using an older compiler, the std compiler c++11 may not compile successfully. If that's the case, use the commands below to compile 
+  - Note: On older compilers, the std compiler c++11 may not compile successfully. If that's the case, use the commands below to compile 
 
 ```
 TrainLogReg.cpp
@@ -21,8 +21,9 @@ Accuracy.cpp
   
 To Run:
 -----------
-TrainLogReg trainingFeature.dat trainingLabel.dat modelFile 785 12665<br>
-TestLogReg modelFile testFeature.dat predLabelFile 785<br>
-Accuracy predLabelFile trainingLabel.dat
-  
+```
+> ./TrainLogReg trainingFeature.dat trainingLabel.dat ModelFile.txt 785 12665
+> ./TestLogReg ModelFile.txt testFeature.dat predLabel.dat 785
+> ./Accuracy predLabel.dat trueLabel.dat
+```  
 
