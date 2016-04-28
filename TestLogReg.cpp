@@ -1,3 +1,7 @@
+//	TestLogReg.cpp
+//	Recieves ModelFile (weight) and Test Features
+//	Produces Prediction label file
+
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -9,7 +13,7 @@
 using namespace std;
 
 vector<float> Read_Model_File(string model_File, int D_features);
-float DotProduct(vector<float> w, vector<float> x);
+float DotProduct(vector<float> &w, vector<float> &x);
 void Read_Test_Feature_File(string test_file, vector<float> w, string predLabelFile, int D_features);
 
 int main(int argc, char *argv[]){
@@ -66,7 +70,7 @@ void Read_Test_Feature_File(string test_file, vector<float> w, string predLabelF
 
 
 	if (in.is_open()){
-	
+
 		while (getline(in, line)){
 			istringstream iss(line);
 			for (int i=0; i < D_features; i++){
@@ -77,7 +81,7 @@ void Read_Test_Feature_File(string test_file, vector<float> w, string predLabelF
 			/*	
 				Computes the DotProduct of ModelFile vector, w, and all 'D' testFeatureFile
 				vectors, x, and writes them to the newly created file
-			*/		
+			*/			
 			if (DotProduct(w,testVector) > 0){
 				outputFile << "1" << endl;
 			}
@@ -99,7 +103,7 @@ void Read_Test_Feature_File(string test_file, vector<float> w, string predLabelF
 /*
   Returns the dot product of 2 vectors
 */
-float DotProduct(vector<float> w, vector<float> x){
+float DotProduct(vector<float> &w, vector<float> &x){
 	float product = 0;
 	for (int i = 0; i < w.size(); i++){
 		product += (w[i] * x[i]);

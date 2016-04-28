@@ -1,6 +1,6 @@
-//Accuracy.cpp
-//compares the two label files
-//Currently prints out final accuracy
+//	Accuracy.cpp
+//	Compares Prediction and Truth label files
+//	Prints out final accuracy
 
 #include <string>
 #include <iostream>
@@ -24,7 +24,7 @@ int main(int argc, char* argv[]){
 	double accuracy = compare(predicted, truth);
 	cout << "Accuracy: " << accuracy << endl;
 
-return 0;
+	return 0;
 }
 
 //reads in values from  file
@@ -32,12 +32,12 @@ void read_in_file(string filename, vector<int> &vector){
  	ifstream in(filename.c_str());
   	string line; 	
   	if(in.is_open()){
-    while(getline(in,line)){
-      vector.push_back(stoi(line));	 
-    }
-    in.close();
-  }
-  else{ cout << "ERROR:: unable to open file!" << endl;}
+    	while(getline(in,line)){
+			vector.push_back(stoi(line));	 
+    	}
+    	in.close();
+  	}
+	else{ cout << "ERROR:: unable to open file: " << filename << "!" << endl;}
 }
 //returns the accuracy
 double compare(vector<int> predicted, vector<int> truth){

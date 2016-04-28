@@ -1,3 +1,7 @@
+//	TrainLogReg.cpp
+//	Recieves Training Feature and Training Labels
+//	Produces ModelFile (weight)
+
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -13,6 +17,7 @@ void read_training_feature(string filename,  vector< vector<int> > &training_fea
 void initialize_w(vector<float> &w, int D_features);
 
 void print_vector(string filename, vector<float> &v);
+void print_vector(string filename, vector<int> &v);
 void print_2Dvector(string filename, vector< vector<int> > &v, int D_features, int N_samples);
 
 int main(int argc, char* argv[]){
@@ -23,14 +28,12 @@ int main(int argc, char* argv[]){
 	int D_features = atoi(argv[4]);      
 	int N_iterations = atoi(argv[5]); 
 
-//short cut for command line:  ./a.out trainingFeature.dat trainingLabel.dat ModelFile.txt 785 12665
-  
     //variables
     vector<int> training_label;
     vector< vector<int> > training_feature;
     float c = 1*pow(10, -6), denomenator, dot_w_xi, exponential;
     int t = 0, yi, currLabel;
-    vector<float> w, temp;
+    vector<float> w;
 
     //reading in files to vectors
     read_training_label(label_name, training_label, N_iterations);
@@ -48,7 +51,7 @@ int main(int argc, char* argv[]){
 		if (currLabel == 0){
 			yi = -1;
 		}
-		else{
+		else {
 			yi = 1;
 		}
 
@@ -59,7 +62,7 @@ int main(int argc, char* argv[]){
 		// Compute the dot product of w and xi
 		dot_w_xi = 0;
 		for (int j=0; j<D_features; j++){
-			dot_w_xi += w[j] * xi[j];
+			dot_w_xi += (w[j] * xi[j]);
 		}
 
 		// yi = -yi
@@ -93,14 +96,10 @@ int main(int argc, char* argv[]){
     	//compute w←w–(c/t)∇w L
 		float c_t = c/t;
 		for (int j=0; j < D_features; j++){
-			temp.push_back(w[j] - (c_t * loss[j]));
+			w[j] = w[j] - (c_t * loss[j]);
 		}
 
-		// Swap contents of 'temp' with vector 'w'
-		w.swap(temp);
-
 		// Clear contents of vectors
-		temp.clear();
 		xi.clear();
 		numerator.clear();
 		loss.clear();
@@ -185,6 +184,18 @@ void print_vector(string filename, vector<float> &v){
 	}
     modelFile.close();
 }
+
+/*
+	Print vector 'v' of type int to file called 'filename'
+*/
+void print_vector(string filename, vector<int> &v){
+    ofstream modelFile(filename);
+	for (int i=0; i<v.size(); i++){
+		modelFile << v[i] << endl;
+	}
+    modelFile.close();
+}
+
 
 /*
 	Print 2D vector of type int to file called 'filename'
